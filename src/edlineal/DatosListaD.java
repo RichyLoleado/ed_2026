@@ -97,7 +97,7 @@ public class DatosListaD implements DatosLista {
     }
 
     public void inicializarIterador(){
-        Object iterador = posInicial;
+        iterador = posInicial;
     }
 
     public boolean esIteradorNulo(){
@@ -233,6 +233,8 @@ public class DatosListaD implements DatosLista {
         }
         pilaAux.imprimir();
     }
+
+
 
 
 

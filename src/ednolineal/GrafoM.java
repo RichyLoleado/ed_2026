@@ -53,7 +53,7 @@ public class GrafoM {
             // el cual es el indice
             int posRenglon = vertOrigen.getNumero();
             int posColumn = vertDestino.getNumero();
-            return aristas.modificar(posRenglon,posColumn,1);
+            return aristas.modificar(posRenglon,posColumn,1.0);
         }
     }
 
@@ -68,24 +68,56 @@ public class GrafoM {
         aristas.imprimirXFilas();
     }
 
-    public DatosListaE recorridoProfundidad(Object origen){
-        //declarar arreglo y pila que se necesitan
-        PilaE pila = new PilaE(vertices.cantidad());
-        DatosListaE marcados = new DatosListaE(vertices.cantidad());
-        //0. inicializar datoslistaE con puros falsos
-        marcados.
-        //1. tomar un nodoo como origen marcarloy meterlo a la pila
-
-        //2. mientras existan elementos en la pila, sacamos uno y lo mandamos a nuestra lista de elementos procesados.
-        //3. los nodos adyacentes al nodo acabado de sacar y que ordenes no estén marcados, se meten a la pila y se marcarán.
-        return null;
-    }
+//    // Recorrido en profundidad
+//    public DatosListaE recorridoProfundidad(Object origen) {
+//        PilaE pila = new PilaE(vertices.cantidad());
+//        DatosListaE marcados = new DatosListaE(vertices.cantidad());
+//        DatosListaE recorrido = new DatosListaE(vertices.cantidad());
+//        // 0. inizializar con puros falsos
+//        marcados.llenar(false, vertices.cantidad());
+//        //1.- tomar un nodo como origen marcarlo y mostrarlo en la pila
+//        //Primero hay que verificar que el origen exista, buscandolo
+//        int indiceOrigen = (int) vertices.buscar(origen);
+//        if (indiceOrigen < 0) { // no existe
+//            return null;
+//        }
+//
+//        Vertice verticeOrigen = (Vertice) vertices.obtener(indiceOrigen);
+//        marcados.modificar(verticeOrigen.getNumero(), true);
+//        pila.meter(verticeOrigen);
+//        while (pila.vacio() == false) {
+//            //2.- mientras existan elemnetos en la pila, sacamos uno y
+//            // lo mandamos a una lista de elementos procesados
+//            Vertice verticeActual = (Vertice) pila.sacar();
+//            recorrido.agregar(verticeActual);
+//
+//            //3.- los nodos adyacentes al nodo acabado de sacar y que ademas
+//            // no estan marcados de meten a la pila y se marcan
+//            marcaryEnpilarAdyacentes(verticeActual, pila, marcados);
+//
+//        }
+//        return recorrido;
+//    }
+//
+//    private void marcaryEnpilarAdyacentes(Vertice origen, PilaE pila, DatosListaE marcados){
+//        // para checar adyaciencias partiendo del origen (una fila)
+//        // Revisaremos todos los posibles destinos (columnas de la matriz)
+//        for (int cadaDestino = 0; cadaDestino< aristas.getMaxColumnas(); cadaDestino++){
+//            // checaresmos si el valor celda(renglon, columna)
+//            Object valor = aristas.obtener(origen.getNumero(), cadaDestino);
+//            if(valor != null && (double)valor != 0 && (boolean)marcados.obtener(cadaDestino) == false){
+//                marcados.modificar(cadaDestino, true);
+//                Vertice verticeAdyaciente = (Vertice) vertices.obtener(cadaDestino);
+//                pila.meter(verticeAdyaciente);
+//            }
+//        }
+//    }
 
     private int calcularIncidenciasVertice(Vertice verticeDestino){
         int numIncidencias = 0;
         for(int cadaOrigenR = 0; cadaOrigenR < aristas.noFilas; cadaOrigenR++){
             Object valorCelda = aristas.obtener(cadaOrigenR, verticeDestino.getNumero());
-            if(valorCelda != null && (double)valorCelda != 0.0){
+            if(valorCelda != null && (double)valorCelda != 0){
                 //existe una flecha hacia ese destino
                 numIncidencias++;
             }
@@ -109,12 +141,27 @@ public class GrafoM {
         for(int cadaPos = 0; cadaPos < incidencias.cantidad(); cadaPos++){
             if((int) incidencias.obtener(cadaPos) == 0 && (boolean)marcados.obtener(cadaPos) == false){
 
-                cola.meter(vertices.obtener(((Vertice)vertices.obtener(cadaPos)).getNumero());
+                cola.meter(vertices.obtener(((Vertice)vertices.obtener(cadaPos)).getNumero()));
                 //marcarlo como marcado
                 marcados.modificar(cadaPos, true);
             }
         }
         //2. encolarlo en la cola
+    }
+
+    public void recalcularIncidencias(Vertice verticeActual, DatosListaE incidencias){
+        //recorer las columnas de la matriz (los destinos)
+        //a los que el vertice origen, les manda una flecha.
+        //recalcular las incidencias de los destinos.
+        for(int posDestino = 0; posDestino < aristas.noCols; posDestino++){
+            Object valorCelda = aristas.obtener(verticeActual.getNumero(), posDestino);
+            // invocar al metodo que calcula las incidencias de uno solo de los destinos
+            if(valorCelda != null && (double)valorCelda != 0.0){ // hay adyacencia entre el origen y el destino
+                //sacar el valor que esta dentro de las incidencias y restarle 1
+                int incidenciasRestar = (int) incidencias.obtener(posDestino) - 1;
+                incidencias.modificar(posDestino, incidenciasRestar);
+            }
+        }
     }
 
     public DatosListaE ordenacionTopologica(){
@@ -133,10 +180,12 @@ public class GrafoM {
             //3. Mientras existan nodos en la cola, secar uno y mandarlo a la OT.
             Vertice verticeActual = (Vertice) cola.sacar();
             ordenacionTopologica.agregar(verticeActual);
-            //4. Recacular indicencias con base en el paso 3
+            //4. Recacular indicencias con base en el paso
+            recalcularIncidencias(verticeActual, incidencias);
             //5. Los nodos con incidencia en 0 se marcan y se meten a la cola.
             marcarYEncolarI0(incidencias, cola, marcados);
         }
+        return ordenacionTopologica;
     }
 
 }
