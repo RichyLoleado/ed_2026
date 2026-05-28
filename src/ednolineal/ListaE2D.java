@@ -143,5 +143,43 @@ public class ListaE2D {
             return true;
     }
 
+    //eliminar fila
+    public boolean eliminarFila(int fila){
+        if(fila < 0 || fila >= noFilas){
+            return false;
+        }
+
+        //mover las filas hacia arriba
+        for(int cadaFila = fila; cadaFila < noFilas - 1; cadaFila++){
+            for(int cadaCol = 0; cadaCol < noCols; cadaCol++){
+                datos[cadaFila][cadaCol] = datos[cadaFila + 1][cadaCol];
+            }
+        }
+
+        //limpiar ultima fila
+        for(int cadaCol = 0; cadaCol < noCols; cadaCol++){
+            datos[noFilas - 1][cadaCol] = null;
+        }
+        return true;
+    }
+
+    public boolean eliminarColumna(int col){
+        if(col < 0 || col >= noCols){
+            return false;
+        }
+        //mover las columnas
+        for(int cadaCol = col; cadaCol < noCols - 1; cadaCol++){
+            for(int cadaFila = 0; cadaFila < noFilas; cadaFila++){
+                datos[cadaFila][cadaCol] = datos[cadaFila][cadaCol + 1];
+            }
+        }
+
+        //limpiar la ultima columna
+        for(int cadaFila = 0; cadaFila < noFilas; cadaFila++){
+            datos[cadaFila][noCols - 1] = null;
+        }
+        return true;
+    }
+
 
 }

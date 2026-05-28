@@ -68,50 +68,50 @@ public class GrafoM {
         aristas.imprimirXFilas();
     }
 
-//    // Recorrido en profundidad
-//    public DatosListaE recorridoProfundidad(Object origen) {
-//        PilaE pila = new PilaE(vertices.cantidad());
-//        DatosListaE marcados = new DatosListaE(vertices.cantidad());
-//        DatosListaE recorrido = new DatosListaE(vertices.cantidad());
-//        // 0. inizializar con puros falsos
-//        marcados.llenar(false, vertices.cantidad());
-//        //1.- tomar un nodo como origen marcarlo y mostrarlo en la pila
-//        //Primero hay que verificar que el origen exista, buscandolo
-//        int indiceOrigen = (int) vertices.buscar(origen);
-//        if (indiceOrigen < 0) { // no existe
-//            return null;
-//        }
-//
-//        Vertice verticeOrigen = (Vertice) vertices.obtener(indiceOrigen);
-//        marcados.modificar(verticeOrigen.getNumero(), true);
-//        pila.meter(verticeOrigen);
-//        while (pila.vacio() == false) {
-//            //2.- mientras existan elemnetos en la pila, sacamos uno y
-//            // lo mandamos a una lista de elementos procesados
-//            Vertice verticeActual = (Vertice) pila.sacar();
-//            recorrido.agregar(verticeActual);
-//
-//            //3.- los nodos adyacentes al nodo acabado de sacar y que ademas
-//            // no estan marcados de meten a la pila y se marcan
-//            marcaryEnpilarAdyacentes(verticeActual, pila, marcados);
-//
-//        }
-//        return recorrido;
-//    }
-//
-//    private void marcaryEnpilarAdyacentes(Vertice origen, PilaE pila, DatosListaE marcados){
-//        // para checar adyaciencias partiendo del origen (una fila)
-//        // Revisaremos todos los posibles destinos (columnas de la matriz)
-//        for (int cadaDestino = 0; cadaDestino< aristas.getMaxColumnas(); cadaDestino++){
-//            // checaresmos si el valor celda(renglon, columna)
-//            Object valor = aristas.obtener(origen.getNumero(), cadaDestino);
-//            if(valor != null && (double)valor != 0 && (boolean)marcados.obtener(cadaDestino) == false){
-//                marcados.modificar(cadaDestino, true);
-//                Vertice verticeAdyaciente = (Vertice) vertices.obtener(cadaDestino);
-//                pila.meter(verticeAdyaciente);
-//            }
-//        }
-//    }
+    // Recorrido en profundidad
+    public DatosListaE recorridoProfundidad(Object origen) {
+        PilaE pila = new PilaE(vertices.cantidad());
+        DatosListaE marcados = new DatosListaE(vertices.cantidad());
+        DatosListaE recorrido = new DatosListaE(vertices.cantidad());
+        // 0. inizializar con puros falsos
+        marcados.llenar(false);
+        //1.- tomar un nodo como origen marcarlo y mostrarlo en la pila
+        //Primero hay que verificar que el origen exista, buscandolo
+        int indiceOrigen = (int) vertices.buscar(origen);
+        if (indiceOrigen < 0) { // no existe
+            return null;
+        }
+
+        Vertice verticeOrigen = (Vertice) vertices.obtener(indiceOrigen);
+        marcados.modificar(verticeOrigen.getNumero(), true);
+        pila.meter(verticeOrigen);
+        while (pila.vacio() == false) {
+            //2.- mientras existan elemnetos en la pila, sacamos uno y
+            // lo mandamos a una lista de elementos procesados
+            Vertice verticeActual = (Vertice) pila.sacar();
+            recorrido.agregar(verticeActual);
+
+            //3.- los nodos adyacentes al nodo acabado de sacar y que ademas
+            // no estan marcados de meten a la pila y se marcan
+            marcaryEnpilarAdyacentes(verticeActual, pila, marcados);
+
+        }
+        return recorrido;
+    }
+
+    private void marcaryEnpilarAdyacentes(Vertice origen, PilaE pila, DatosListaE marcados){
+        // para checar adyaciencias partiendo del origen (una fila)
+        // Revisaremos todos los posibles destinos (columnas de la matriz)
+        for (int cadaDestino = 0; cadaDestino< aristas.obtenerColumnas(); cadaDestino++){
+            // checaresmos si el valor celda(renglon, columna)
+            Object valor = aristas.obtener(origen.getNumero(), cadaDestino);
+            if(valor != null && (double)valor != 0 && (boolean)marcados.obtener(cadaDestino) == false){
+                marcados.modificar(cadaDestino, true);
+                Vertice verticeAdyaciente = (Vertice) vertices.obtener(cadaDestino);
+                pila.meter(verticeAdyaciente);
+            }
+        }
+    }
 
     private int calcularIncidenciasVertice(Vertice verticeDestino){
         int numIncidencias = 0;
@@ -186,6 +186,96 @@ public class GrafoM {
             marcarYEncolarI0(incidencias, cola, marcados);
         }
         return ordenacionTopologica;
+    }
+
+    //Eliminar un vertice del grafo
+    public boolean eliminarVertice(Object verticeEliminar){
+        //buscar posicion del vertice y guardar la posicion del vertice
+        int indiceE = (int) vertices.buscar(verticeEliminar);
+        //validar que el indice a eliminar exista
+        if(indiceE < 0){
+            return false;
+        }
+        //eliminar filas y columnas la matriz de aristas
+        aristas.eliminarFila(indiceE);
+        aristas.eliminarColumna(indiceE);
+
+        //eliminar el vertice del arreglo de vertices
+        vertices.eliminar(vertices.obtener(indiceE));
+
+        //asignar nuevos valores de los vertices
+        for(int cadaVertice = 0; cadaVertice < vertices.cantidad(); cadaVertice++){
+            Vertice verticeNuevo = (Vertice) vertices.obtener(cadaVertice);
+            verticeNuevo.setNumero(cadaVertice);
+        }
+        return true;
+    }
+
+    public Vertice buscarVertice(Object VerticeBuscado){
+        //recorrer la lista de vertices
+        for(int posicion = 0; posicion < vertices.cantidad(); posicion++){
+            //obtener el vertice de la posicion
+            Vertice verticeActual = (Vertice) vertices.obtener(posicion);
+            //comparar si el vertice actual es igual al vertice que se busca
+            if(verticeActual.getDescripcion().toString().equalsIgnoreCase(VerticeBuscado.toString())){
+                return verticeActual; //regresar el vertice encontrado
+            }
+        }
+        return null; // no se encontró el vertice buscado
+    }
+
+    public boolean esAdyacente(Object origen, Object destino){
+        //buscar vertices
+        Vertice verticeOrigen = buscarVertice(origen);
+        Vertice verticeDestino = buscarVertice(destino);
+        //validar que existan los vertices
+        if(verticeOrigen == null || verticeDestino == null){
+            return false;
+        }
+        //consultar a la matriz
+        Object valorCelda = aristas.obtener(verticeOrigen.getNumero(), verticeDestino.getNumero());
+        //validar si son adyacentes
+        if(((double)valorCelda) == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public boolean eliminarArista(Object origen, Object destino){
+        if(esAdyacente(origen, destino) == false){
+            return false;
+        }
+        //buscar vertices
+        Vertice verticeOrigen = buscarVertice(origen);
+        Vertice verticeDestino = buscarVertice(destino);
+
+        //eliminar la arista
+        aristas.modificar(verticeOrigen.getNumero(), verticeDestino.getNumero(), 0.0);
+        return true;
+    }
+
+    public int gradoVertice(Object vertice){
+        Vertice verticeBuscado = buscarVertice(vertice);
+        //validar que el vertice exista
+        if(verticeBuscado == null){
+            return -1;
+        }
+
+        int contador = 0;
+        for(int posicion = 0; posicion < vertices.cantidad(); posicion++){
+            Vertice verticeActual = (Vertice) vertices.obtener(posicion);
+            // verificar adyacencia
+            if(esAdyacente(verticeBuscado.getDescripcion(), verticeActual.getDescripcion())){
+                contador++;
+            }
+        }
+        return contador;
+    }
+
+    public void listarVertices(){
+        //imprimir los vertices
+        vertices.imprimir();
     }
 
 }

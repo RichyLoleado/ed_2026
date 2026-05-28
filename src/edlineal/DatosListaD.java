@@ -88,6 +88,7 @@ public class DatosListaD implements DatosLista {
         NodoDinamico posAnterior = posInicial;
         NodoDinamico posBusqueda = posInicial;
         while (posBusqueda != null && valor.toString().equalsIgnoreCase(posBusqueda.getValor().toString()) == false){
+            posAnterior = posBusqueda;
             posBusqueda = posBusqueda.getPosSiguiente();
         }
         NodoBusqueda posNodoBusqueda = new NodoBusqueda();
@@ -149,10 +150,10 @@ public class DatosListaD implements DatosLista {
                     NodoDinamico anterior = nodoEncontrar.getPosAnterior();
                     NodoDinamico siguiente = nodoEncontrar.getPosBusqueda().getPosSiguiente();
                     anterior.setPosSiguiente(siguiente);
+                    return respaldo;
                 }
             }
         }
-        return null;
     }
 
     public int cantidad(){

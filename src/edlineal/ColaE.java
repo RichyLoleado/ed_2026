@@ -68,7 +68,7 @@ public class ColaE implements DatosLote{
 
             } else if (posInicial == capacidad - 1) {
                 respaldo = datos[posInicial];
-                posFinal = 0;
+                posInicial = 0;
             }else{
                 respaldo = datos[posInicial];
                 posInicial = posInicial + 1;
